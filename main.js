@@ -7,8 +7,9 @@ const deleteChatButton=document.querySelector("#delete-chat-button")
 let userMessage=null;
 let isResponseGenerating=false;
 
-const API_KEY="AIzaSyBOzgdT5lnn86HrJcn7uGAyQ2oZC7fszrM";
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+const API_KEY=""; //Enter your OpenRouter API key here
+const API_URL = `https://openrouter.ai/api/v1`;  //Update this URL if needed as user needs 
+const MODEL_NAME = "google/gemma-3n-e2b-it:free";
 
 const loadLocalStorageData = () => {
     const savedChats = localStorage.getItem("savedChats");
@@ -58,30 +59,34 @@ const showTypingEffect =(text, textElement, incomingMessageDiv) => {
 const generateAPIResponse = async (incomingMessageDiv) => {
     const textElement = incomingMessageDiv.querySelector(".text");
 
-//send a POST request to the api with users message
-   try{
-       const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type" : "application/json" },
-        body: JSON.stringify({
-            contents: [{
-                role:"user",
-                parts: [{ text: userMessage }]
-            }]
-        })
-    });
-    const data = await response.json();
-    if(!response.ok) throw new Error(data.error.message);
+    // Send a POST request to OpenRouter API with embedded API key, URL, and model name
+    try {
+        const response = await fetch(API_URL + "/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${API_KEY}`
+            },
+            body: JSON.stringify({
+                model: MODEL_NAME,
+                messages: [
+                    { role: "user", content: userMessage }
+                ]
+            })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error?.message || "API Error");
 
-    const apiResponse = data?.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, '$1');
-    showTypingEffect(apiResponse, textElement, incomingMessageDiv);
-   }catch(error){
-    isResponseGenerating=false;
-    textElement.innerText=error.message;
-    textElement.classList.add("error");
-   }finally {
-    incomingMessageDiv.classList.remove("loading");
-   }
+        // OpenRouter returns choices[0].message.content
+        const apiResponse = data?.choices?.[0]?.message?.content?.replace(/\*\*(.*?)\*\*/g, '$1') || "";
+        showTypingEffect(apiResponse, textElement, incomingMessageDiv);
+    } catch (error) {
+        isResponseGenerating = false;
+        textElement.innerText = error.message;
+        textElement.classList.add("error");
+    } finally {
+        incomingMessageDiv.classList.remove("loading");
+    }
 }
 
 //show animation while waiting

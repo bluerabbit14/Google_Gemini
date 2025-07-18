@@ -1,0 +1,13 @@
+{
+  "name": "google_gemini",
+  "version": "1.0.0",
+  "description": "An AI Google Gemini model implementing Google Gemini API",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
