@@ -9,7 +9,7 @@ let isResponseGenerating=false;
 
 const API_KEY=""; //Enter your OpenRouter API key here
 const API_URL = `https://openrouter.ai/api/v1`;  //Update this URL if needed as user needs 
-const MODEL_NAME = "google/gemma-3n-e2b-it:free";
+const MODEL_NAME = "google/gemma-3n-e2b-it:free";  //Update this model as user your need
 
 const loadLocalStorageData = () => {
     const savedChats = localStorage.getItem("savedChats");
